@@ -2,9 +2,13 @@
 
 This file is used to list changes made in each version of typo3.
 
+## 0.1.1:
+
+* [BUGFIX] Add dependency on Git
+
 ## 0.1.0:
 
-* Initial release of typo3
+* [FEATURE] Initial release of typo3
 
 - - -
 Check the [Markdown Syntax Guide](http://daringfireball.net/projects/markdown/syntax) for help with Markdown.
