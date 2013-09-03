@@ -34,6 +34,15 @@ git "#{node['typo3']['shared_git_directory']}" do
   action :sync
 end
 
+# Update existing TYPO3 core (the above sync does not work if the revision does not change)
+execute "Update the shared Git directory" do
+  cwd "#{node['typo3']['shared_git_directory']}"
+  command <<-EOH
+    git fetch origin
+  EOH
+  only_if { ::File.exists?("#{node['typo3']['shared_git_directory']}") }
+end
+
 # Create initial clone of TYPO3core
 # Use git-new-workdir share the main ".git" folder between all versions
 node['typo3']['install_branches'].each do |branch|
