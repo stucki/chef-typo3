@@ -6,6 +6,8 @@ description      'Clone TYPO3 CMS to a server, and keep it updated'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 version          '0.1.0'
 
+depends "git"
+
 attribute "typo3/base_directory",
   :display_name => "Base Directory",
   :description => "Base directory where TYPO3 CMS Core will be cloned inside",
