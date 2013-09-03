@@ -26,12 +26,11 @@
 
 include_recipe 'git'
 
-git "#{node['typo3']['base_directory']}/TYPO3core.git" do
+git "#{node['typo3']['shared_git_directory']}" do
   repository "#{node['typo3']['repository_url']}"
   # This is the very first revision in the repository.
   # It contains an empty commit, so it's equal to git clone --no-checkout
   revision "feffa595f3cf67d14db7727a1028eac550dc6ef6"
-  #reference "master"
   action :sync
 end
 
