@@ -2,6 +2,10 @@
 
 This file is used to list changes made in each version of typo3.
 
+## 0.2.0:
+
+* [FEATURE] Major rewrite with lots of bugfixes
+
 ## 0.1.2:
 
 * [FEATURE] Move git-new-workdir path into an attribute

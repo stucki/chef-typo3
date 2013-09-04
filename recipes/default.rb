@@ -46,29 +46,42 @@ end
 # Create initial clone of TYPO3core
 # Use git-new-workdir share the main ".git" folder between all versions
 node['typo3']['install_branches'].each do |branch|
-  execute "Create new TYPO3 working directory for version #{branch}" do
-    command <<-EOH
-      sh #{path_git-new-workdir} \
-          #{node['typo3']['shared_git_directory']} \
-          #{node['typo3']['base_directory']}/#{branch}.git \
-          #{branch}
-      touch #{node['typo3']['base_directory']}/#{branch}.cloned-by-chef
-      rm #{node['typo3']['base_directory']}/#{branch}.clone
-    EOH
-    not_if { ::File.exists?("#{node['typo3']['base_directory']}/#{branch}.git") }
-    # Only clone the repository if explicitely requested
-    only_if { ::File.exists?("#{node['typo3']['base_directory']}/#{branch}.clone") }
-  end
-end
+  destination_prefix = node['typo3']['base_directory'] + "/#{branch}"
 
-# Update existing clone of TYPO3core (using git reset)
-node['typo3']['install_branches'].each do |branch|
-  execute "Update TYPO3core for version #{branch}" do
-    command <<-EOH
-      git reset --hard origin/#{branch}
-    EOH
-    cwd "#{node['typo3']['base_directory']}/#{branch}.git"
+  # Only clone the repository if explicitely requested
+  if ::File.exists?("#{destination_prefix}.clone") and not ::File.exists?("#{destination_prefix}.git")
+
+    execute "Create new TYPO3 working directory for version #{branch}" do
+      cwd "#{node['typo3']['base_directory']}"
+      command <<-EOH
+        sh #{node['typo3']['path_git-new-workdir']} \
+            #{node['typo3']['shared_git_directory']} \
+            #{destination_prefix}.git
+        touch #{destination_prefix}.cloned-by-chef
+        rm #{destination_prefix}.clone
+      EOH
+    end
+
+    execute "Create new local branch #{branch}" do
+      cwd "#{destination_prefix}.git"
+      command "git checkout #{branch} || git checkout -b #{branch} origin/#{branch}"
+    end
+
+  elsif ::File.exists?("#{destination_prefix}.git")
+
     # Only reset if managed by Chef
-    only_if { ::File.exists?("#{node['typo3']['base_directory']}/#{branch}.git") && ::File.exists?("#{node['typo3']['base_directory']}/#{branch}.cloned-by-chef") }
+    if ::File.exists?("#{destination_prefix}.cloned-by-chef")
+
+      # Update existing clone of TYPO3core (using git reset)
+      execute "Update TYPO3core for version #{branch}" do
+        cwd "#{destination_prefix}.git"
+        command "git reset --hard origin/#{branch}"
+      end
+    else
+      Chef::Log.debug("Skipping update of #{destination_prefix}.git: The repository is not managed by Chef.")
+    end
+  else
+    Chef::Log.debug("Skipping clone of #{destination_prefix}.git: Missing clone file.")
   end
+
 end
