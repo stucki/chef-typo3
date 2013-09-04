@@ -48,7 +48,7 @@ end
 node['typo3']['install_branches'].each do |branch|
   execute "Create new TYPO3 working directory for version #{branch}" do
     command <<-EOH
-      sh /usr/share/doc/git/contrib/workdir/git-new-workdir \
+      sh #{path_git-new-workdir} \
           #{node['typo3']['shared_git_directory']} \
           #{node['typo3']['base_directory']}/#{branch}.git \
           #{branch}

@@ -4,7 +4,7 @@ maintainer_email 'michael.stucki@typo3.org'
 license          'MIT'
 description      'Clone TYPO3 CMS to a server, and keep it updated'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version          '0.1.0'
+version          '0.1.2'
 
 depends "git"
 
@@ -23,6 +23,11 @@ attribute "typo3/install_branches",
   :description => "These branches will be installed and updated using Chef",
   :type => "array",
   :default => [ "TYPO3_4-7", "TYPO3_6-1" ]
+
+attribute "typo3/path_git-new-workdir",
+  :display_name => "Location of the \"git-new-workdir\" helper script",
+  :description => "This script is used to create a new working copy. It creates symlinks to the shared Git directory, which can save a lot of disk space.",
+  :default => "/usr/share/doc/git/contrib/workdir/git-new-workdir"
 
 attribute "typo3/shared_git_directory",
   :display_name => "Location of the shared TYPO3 CMS core directory",
