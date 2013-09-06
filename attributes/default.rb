@@ -13,6 +13,4 @@ else
   default['typo3']['path_git-new-workdir'] = "/usr/share/doc/git/contrib/workdir/git-new-workdir"
 end
 
-# Currently, only shared Git repositories work
-#default['typo3']['share_git'] = true 
 default['typo3']['shared_git_directory'] = "#{node['typo3']['base_directory']}/TYPO3core.git"
