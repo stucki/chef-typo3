@@ -28,21 +28,39 @@ include_recipe 'git'
 
 shared_git_directory = node['typo3']['shared_git_directory'].gsub(/.git$/, '')
 
-git "#{shared_git_directory}.git" do
-  repository "#{node['typo3']['repository_url']}"
-  # This is the very first revision in the repository.
-  # It contains an empty commit, so it's equal to git clone --no-checkout
-  revision "feffa595f3cf67d14db7727a1028eac550dc6ef6"
-  action :sync
-end
+if ::File.exists?("#{shared_git_directory}.clone") and not ::File.exists?("#{shared_git_directory}.git")
 
-# Update existing TYPO3 core (the above sync does not work if the revision does not change)
-execute "Update the shared Git directory" do
-  cwd "#{shared_git_directory}.git"
-  command <<-EOH
-    git fetch origin
-  EOH
-  only_if { ::File.exists?("#{node['typo3']['shared_git_directory']}") }
+  git "#{shared_git_directory}.git" do
+    repository "#{node['typo3']['repository_url']}"
+    # This is the very first revision in the repository.
+    # It contains an empty commit, so it's equal to git clone --no-checkout
+    revision "feffa595f3cf67d14db7727a1028eac550dc6ef6"
+    action :sync
+  end
+
+  execute "Add marker file to #{shared_git_directory}" do
+    cwd "#{node['typo3']['base_directory']}"
+    command <<-EOH
+      touch #{shared_git_directory}.cloned-by-chef
+      rm #{shared_git_directory}.clone
+    EOH
+  end
+
+elsif ::File.exists?("#{shared_git_directory}.git")
+
+  # Only reset if managed by Chef
+  if ::File.exists?("#{shared_git_directory}.cloned-by-chef")
+
+    # Update existing TYPO3 core (the above sync does not work if the revision does not change)
+    execute "Update the shared Git directory" do
+      cwd "#{shared_git_directory}.git"
+      command "git fetch origin"
+    end
+  else
+    Chef::Log.debug("Skipping update of #{shared_git_directory}.git: The repository is not managed by Chef.")
+  end
+else
+  Chef::Log.debug("Skipping clone of #{shared_git_directory}.git: Missing clone file.")
 end
 
 # Create initial clone of TYPO3core
