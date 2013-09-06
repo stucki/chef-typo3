@@ -2,6 +2,13 @@
 
 This file is used to list changes made in each version of typo3.
 
+## 0.3.0:
+
+* [BUGFIX] Fix permissions (make sure files are world-readable)
+* [FEATURE] Only clone TYPO3core.git if requested
+* [CLEANUP] More code cleanup
+* [CLEANUP] Remove unused setting
+
 ## 0.2.0:
 
 * [FEATURE] Major rewrite with lots of bugfixes
