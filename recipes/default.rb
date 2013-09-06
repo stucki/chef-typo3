@@ -26,7 +26,9 @@
 
 include_recipe 'git'
 
-git "#{node['typo3']['shared_git_directory']}" do
+shared_git_directory = node['typo3']['shared_git_directory'].gsub(/.git$/, '')
+
+git "#{shared_git_directory}.git" do
   repository "#{node['typo3']['repository_url']}"
   # This is the very first revision in the repository.
   # It contains an empty commit, so it's equal to git clone --no-checkout
@@ -36,7 +38,7 @@ end
 
 # Update existing TYPO3 core (the above sync does not work if the revision does not change)
 execute "Update the shared Git directory" do
-  cwd "#{node['typo3']['shared_git_directory']}"
+  cwd "#{shared_git_directory}.git"
   command <<-EOH
     git fetch origin
   EOH
@@ -55,7 +57,7 @@ node['typo3']['install_branches'].each do |branch|
       cwd "#{node['typo3']['base_directory']}"
       command <<-EOH
         sh #{node['typo3']['path_git-new-workdir']} \
-            #{node['typo3']['shared_git_directory']} \
+            #{shared_git_directory}.git \
             #{destination_prefix}.git
         touch #{destination_prefix}.cloned-by-chef
         rm #{destination_prefix}.clone
