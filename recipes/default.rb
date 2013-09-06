@@ -38,8 +38,13 @@ if ::File.exists?("#{shared_git_directory}.clone") and not ::File.exists?("#{sha
     action :sync
   end
 
+  execute "Fix permissions on #{shared_git_directory}.git" do
+    command "chmod -R a+rX #{shared_git_directory}.git"
+  end
+
   execute "Add marker file to #{shared_git_directory}" do
     cwd "#{node['typo3']['base_directory']}"
+    umask 0022
     command <<-EOH
       touch #{shared_git_directory}.cloned-by-chef
       rm #{shared_git_directory}.clone
@@ -54,6 +59,7 @@ elsif ::File.exists?("#{shared_git_directory}.git")
     # Update existing TYPO3 core (the above sync does not work if the revision does not change)
     execute "Update the shared Git directory" do
       cwd "#{shared_git_directory}.git"
+      umask 0022
       command "git fetch origin"
     end
   else
@@ -73,6 +79,7 @@ node['typo3']['install_branches'].each do |branch|
 
     execute "Create new TYPO3 working directory for version #{branch}" do
       cwd "#{node['typo3']['base_directory']}"
+      umask 0022
       command <<-EOH
         sh #{node['typo3']['path_git-new-workdir']} \
             #{shared_git_directory}.git \
@@ -84,6 +91,7 @@ node['typo3']['install_branches'].each do |branch|
 
     execute "Create new local branch #{branch}" do
       cwd "#{destination_prefix}.git"
+      umask 0022
       command "git checkout #{branch} || git checkout -b #{branch} origin/#{branch}"
     end
 
@@ -95,6 +103,7 @@ node['typo3']['install_branches'].each do |branch|
       # Update existing clone of TYPO3core (using git reset)
       execute "Update TYPO3core for version #{branch}" do
         cwd "#{destination_prefix}.git"
+        umask 0022
         command "git reset --hard origin/#{branch}"
       end
     else
