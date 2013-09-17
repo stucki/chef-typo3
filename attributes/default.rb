@@ -7,6 +7,12 @@ default['typo3']['install_branches'] = %w{
   TYPO3_6-1
 }
 
+# Alternatively, install_branches can also hold pairs of <branch name> / <reference>
+#default['typo3']['install_branches'] = [
+#  {:name => 'TYPO3_4-7', :reference => 'TYPO3_4-7-20'},
+#  {:name => 'TYPO3_6-1', :reference => 'origin/TYPO3_6-1'}
+#]
+
 if node['platform'] == 'debian' && node['platform_version'].to_f < 6 then
   default['typo3']['path_git-new-workdir'] = "/usr/share/doc/git-core/contrib/workdir/git-new-workdir"
 else

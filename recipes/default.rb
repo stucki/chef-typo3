@@ -87,7 +87,20 @@ end
 # Maintain clones of TYPO3 versions
 #####################################
 
-node['typo3']['install_branches'].each do |branch|
+node['typo3']['install_branches'].each do |v|
+
+  # Read branch name and reference from attributes
+  if v.kind_of?(Mash) and v.has_key?(:name)
+    branch      = v[:name]
+    reference   = v[:reference]
+  elsif v.kind_of?(String)
+    branch      = v
+    reference   = v
+  else
+    Chef::Log.error("Error: Syntax error in node['typo3']['install_branches']:\n" +  node['typo3']['install_branches'].to_s + "\n")
+    Chef::Application.fatal!("Cannot continue.")
+  end
+
   source             = shared_git_directory + ".git"
   destination        = base_directory + "/" + branch + ".git"
   clonefile          = base_directory + "/" + branch + ".clone"
@@ -119,7 +132,7 @@ node['typo3']['install_branches'].each do |branch|
     execute "Create new local branch #{branch}" do
       cwd destination
       umask 0022
-      command "git checkout #{branch} || git checkout -b #{branch} origin/#{branch}"
+      command "git checkout #{branch} || git checkout -b #{branch}; git reset --hard #{reference}"
     end
 
   elsif ::File.exists?(destination)
@@ -131,7 +144,7 @@ node['typo3']['install_branches'].each do |branch|
       execute "Update TYPO3core for version #{branch}" do
         cwd destination
         umask 0022
-        command "git reset --hard origin/#{branch}"
+        command "git reset --hard #{reference}"
       end
     else
       Chef::Log.debug("Skipping update of #{destination}: The repository is not managed by Chef.")
