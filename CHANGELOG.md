@@ -2,6 +2,10 @@
 
 This file is used to list changes made in each version of typo3.
 
+## 0.4.0:
+
+* [CLEANUP] Make more use of variables
+
 ## 0.3.0:
 
 * [BUGFIX] Fix permissions (make sure files are world-readable)

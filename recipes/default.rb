@@ -26,91 +26,110 @@
 
 include_recipe 'git'
 
+base_directory       = node['typo3']['base_directory']
+git_new_workdir      = node['typo3']['path_git-new-workdir']
 shared_git_directory = node['typo3']['shared_git_directory'].gsub(/.git$/, '')
 
-if ::File.exists?("#{shared_git_directory}.clone") and not ::File.exists?("#{shared_git_directory}.git")
+destination          = shared_git_directory + ".git"
+clonefile            = shared_git_directory + ".clone"
+markerfile           = shared_git_directory + ".cloned-by-chef"
 
-  git "#{shared_git_directory}.git" do
-    repository "#{node['typo3']['repository_url']}"
-    # This is the very first revision in the repository.
+#####################################
+# Maintain the shared TYPO3 core
+#####################################
+
+if ::File.exists?(clonefile) and not ::File.exists?(destination)
+
+  # Make a fresh clone
+  git destination do
+    repository node['typo3']['repository_url']
+    # This is the very first revision in the TYPO3 CMS repository.
     # It contains an empty commit, so it's equal to git clone --no-checkout
     revision "feffa595f3cf67d14db7727a1028eac550dc6ef6"
     action :sync
   end
 
-  execute "Fix permissions on #{shared_git_directory}.git" do
-    command "chmod -R a+rX #{shared_git_directory}.git"
+  # Fix permissions
+  execute "Fix permissions on #{destination}" do
+    command "chmod -R a+rX #{destination}"
   end
 
-  execute "Add marker file to #{shared_git_directory}" do
-    cwd "#{node['typo3']['base_directory']}"
+  # Cleanup
+  execute "Add marker file to #{destination}" do
+    cwd node['typo3']['base_directory']
     umask 0022
     command <<-EOH
-      touch #{shared_git_directory}.cloned-by-chef
-      rm #{shared_git_directory}.clone
+      touch markerfile
+      rm clonefile
     EOH
   end
 
-elsif ::File.exists?("#{shared_git_directory}.git")
+elsif ::File.exists?(destination)
 
   # Only reset if managed by Chef
-  if ::File.exists?("#{shared_git_directory}.cloned-by-chef")
+  if ::File.exists?(markerfile)
 
     # Update existing TYPO3 core (the above sync does not work if the revision does not change)
     execute "Update the shared Git directory" do
-      cwd "#{shared_git_directory}.git"
+      cwd destination
       umask 0022
       command "git fetch origin"
     end
   else
-    Chef::Log.debug("Skipping update of #{shared_git_directory}.git: The repository is not managed by Chef.")
+    Chef::Log.debug("Skipping update of #{destination}: The repository is not managed by Chef.")
   end
 else
-  Chef::Log.debug("Skipping clone of #{shared_git_directory}.git: Missing clone file.")
+  Chef::Log.debug("Skipping clone of #{destination}: Missing clone file.")
 end
 
-# Create initial clone of TYPO3core
-# Use git-new-workdir share the main ".git" folder between all versions
+
+#####################################
+# Maintain clones of TYPO3 versions
+#####################################
+
 node['typo3']['install_branches'].each do |branch|
-  destination_prefix = node['typo3']['base_directory'] + "/#{branch}"
+  source             = shared_git_directory + ".git"
+  destination        = base_directory + "/" + branch + ".git"
+  clonefile          = base_directory + "/" + branch + ".clone"
+  markerfile         = base_directory + "/" + branch + ".cloned-by-chef"
 
   # Only clone the repository if explicitely requested
-  if ::File.exists?("#{destination_prefix}.clone") and not ::File.exists?("#{destination_prefix}.git")
+  if ::File.exists?(clonefile) and not ::File.exists?(destination)
 
+    # Create initial clone of TYPO3core
+    # Use git-new-workdir share the main ".git" folder between all versions
     execute "Create new TYPO3 working directory for version #{branch}" do
-      cwd "#{node['typo3']['base_directory']}"
+      cwd base_directory
       umask 0022
       command <<-EOH
-        sh #{node['typo3']['path_git-new-workdir']} \
-            #{shared_git_directory}.git \
-            #{destination_prefix}.git
-        touch #{destination_prefix}.cloned-by-chef
-        rm #{destination_prefix}.clone
+        sh #{git_new_workdir} #{source} #{destination}
+        touch #{markerfile}
+        rm #{clonefile}
       EOH
     end
 
     execute "Create new local branch #{branch}" do
-      cwd "#{destination_prefix}.git"
+      cwd destination
       umask 0022
       command "git checkout #{branch} || git checkout -b #{branch} origin/#{branch}"
     end
 
-  elsif ::File.exists?("#{destination_prefix}.git")
+  elsif ::File.exists?(destination)
 
     # Only reset if managed by Chef
-    if ::File.exists?("#{destination_prefix}.cloned-by-chef")
+    if ::File.exists?(markerfile)
 
       # Update existing clone of TYPO3core (using git reset)
       execute "Update TYPO3core for version #{branch}" do
-        cwd "#{destination_prefix}.git"
+        cwd destination
         umask 0022
         command "git reset --hard origin/#{branch}"
       end
     else
-      Chef::Log.debug("Skipping update of #{destination_prefix}.git: The repository is not managed by Chef.")
+      Chef::Log.debug("Skipping update of #{destination}: The repository is not managed by Chef.")
     end
   else
-    Chef::Log.debug("Skipping clone of #{destination_prefix}.git: Missing clone file.")
+    Chef::Log.debug("Skipping clone of #{destination}: Missing clone file.")
   end
 
 end
