@@ -94,7 +94,15 @@ node['typo3']['install_branches'].each do |branch|
   markerfile         = base_directory + "/" + branch + ".cloned-by-chef"
 
   # Only clone the repository if explicitely requested
-  if ::File.exists?(clonefile) and not ::File.exists?(destination)
+  if ::File.exists?(clonefile)
+
+    if ::File.exists?(destination)
+      # If the destination already exists, operate on a temporary folder and let the admin review the change
+      # In order to use this folder, the admin needs to rename the temporary folder to the real destination name.
+      tempname       = Dir::Tmpname.make_tmpname(branch + "_", nil)
+      destination    = base_directory + "/" + tempname + ".git"
+      markerfile     = base_directory + "/" + tempname + ".cloned-by-chef"
+    end
 
     # Create initial clone of TYPO3core
     # Use git-new-workdir share the main ".git" folder between all versions

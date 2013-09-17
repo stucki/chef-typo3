@@ -5,6 +5,9 @@ This file is used to list changes made in each version of typo3.
 ## 0.4.0:
 
 * [CLEANUP] Make more use of variables
+* [FEATURE] If the destination already exists, operate on a temporary folder
+  In order to use this folder, the admin needs to rename the temporary folder to the real destination name.
+
 
 ## 0.3.0:
 
