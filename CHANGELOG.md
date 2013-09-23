@@ -4,6 +4,7 @@ This file is used to list changes made in each version of typo3.
 
 ## 0.4.2:
 
+* [BUGFIX] Fix a typo
 * [BUGFIX] Update the remote repository URL in case it was changed
 
 ## 0.4.1:

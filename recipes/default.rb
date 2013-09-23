@@ -59,8 +59,8 @@ if ::File.exists?(clonefile) and not ::File.exists?(destination)
     cwd node['typo3']['base_directory']
     umask 0022
     command <<-EOH
-      touch markerfile
-      rm clonefile
+      touch #{markerfile}
+      rm #{clonefile}
     EOH
   end
 
