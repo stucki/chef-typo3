@@ -70,10 +70,14 @@ elsif ::File.exists?(destination)
   if ::File.exists?(markerfile)
 
     # Update existing TYPO3 core (the above sync does not work if the revision does not change)
+    # Additionally, update the remote repository URL in case it was changed
     execute "Update the shared Git directory" do
       cwd destination
       umask 0022
-      command "git fetch origin"
+      command <<-EOH
+        git config remote.origin.url #{node['typo3']['repository_url']}
+        git fetch origin
+      EOH
     end
   else
     Chef::Log.debug("Skipping update of #{destination}: The repository is not managed by Chef.")
