@@ -2,6 +2,10 @@
 
 This file is used to list changes made in each version of typo3.
 
+## 0.4.1:
+
+* [BUGFIX] Work around Dir::Tmpname.make_tmpname which is missing in Ruby 1.8.7
+
 ## 0.4.0:
 
 * [CLEANUP] Make more use of variables

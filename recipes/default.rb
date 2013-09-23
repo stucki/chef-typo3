@@ -112,7 +112,15 @@ node['typo3']['install_branches'].each do |v|
     if ::File.exists?(destination)
       # If the destination already exists, operate on a temporary folder and let the admin review the change
       # In order to use this folder, the admin needs to rename the temporary folder to the real destination name.
-      tempname       = Dir::Tmpname.make_tmpname(branch + "_", nil)
+      prefix = branch + "_"
+
+      # This fails on Ruby 1.8.7. Using an ugly workaround with Dir.mktmpdir instead
+      #tempname       = Dir::Tmpname.make_tmpname(prefix, nil)
+
+      path = Dir.mktmpdir(prefix, base_directory)
+      tempname = File.basename(path)
+      FileUtils.remove_entry_secure path
+
       destination    = base_directory + "/" + tempname + ".git"
       markerfile     = base_directory + "/" + tempname + ".cloned-by-chef"
     end
