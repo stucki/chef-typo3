@@ -20,7 +20,7 @@ attribute "typo3/repository_url",
 
 attribute "typo3/install_branches",
   :display_name => "Branches to install",
-  :description => "These branches will be installed and updated using Chef",
+  :description => "These branches (strings or array of <name> / <reference>) will be installed and updated using Chef",
   :type => "array",
   :default => [ "TYPO3_4-7", "TYPO3_6-1" ]
 
