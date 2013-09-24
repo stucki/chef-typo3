@@ -75,7 +75,8 @@ elsif ::File.exists?(destination)
       cwd destination
       umask 0022
       command <<-EOH
-        git config remote.origin.url #{node['typo3']['repository_url']}
+        git config remote.origin.url "#{node['typo3']['repository_url']}"
+        git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
         git fetch origin
       EOH
     end

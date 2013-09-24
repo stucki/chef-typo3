@@ -2,6 +2,10 @@
 
 This file is used to list changes made in each version of typo3.
 
+## 0.4.3:
+
+* [BUGFIX] Set the "fetch" refspec when updating the remote
+
 ## 0.4.2:
 
 * [BUGFIX] Fix a typo
