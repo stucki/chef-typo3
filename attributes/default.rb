@@ -25,3 +25,6 @@ end
 
 # Location of the shared TYPO3 CMS core directory
 default['typo3']['shared_git_directory'] = "#{node['typo3']['base_directory']}/TYPO3core.git"
+
+# Check for *.clone files before cloning
+default['typo3']['check_clone_file'] = false

@@ -4,6 +4,14 @@ This file is used to list changes made in each version of typo3.
 
 ## 0.5.0:
 
+#### Breaking changes
+
+* [FEATURE] Add new option "check_clone_file" to skip the check for *.clone files.
+  The setting is turned off by default, which is a different behaviour than before.
+  This means that any repository set in "install_branches" is now created by default.
+
+#### Non-breaking changes
+
 * [CLEANUP] Rename internal variables
 
 ## 0.4.3:

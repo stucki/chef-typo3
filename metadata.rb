@@ -33,3 +33,8 @@ attribute "typo3/shared_git_directory",
   :display_name => "Location of the shared TYPO3 CMS core directory",
   :description => "TYPO3 CMS core will be cloned into this directory. Other projects will share the .git subfolder of it using symlinks.",
   :default => "\#{node['typo3']['base_directory']}/TYPO3core.git"
+
+attribute "typo3/check_clone_file",
+  :display_name => "Check for *.clone files before cloning",
+  :description => "Only clone a folder if a file <branchname>.clone exists in the base directory. This is useful if all branches are defined globally, but they don't need to be installed on all servers.",
+  :default => "false"
