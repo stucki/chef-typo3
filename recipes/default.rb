@@ -31,14 +31,14 @@ git_new_workdir      = node['typo3']['path_git-new-workdir']
 shared_git_directory = node['typo3']['shared_git_directory'].gsub(/.git$/, '')
 
 destination          = shared_git_directory + ".git"
-clonefile            = shared_git_directory + ".clone"
-markerfile           = shared_git_directory + ".cloned-by-chef"
+clone_file           = shared_git_directory + ".clone"
+marker_file          = shared_git_directory + ".cloned-by-chef"
 
 #####################################
 # Maintain the shared TYPO3 core
 #####################################
 
-if ::File.exists?(clonefile) and not ::File.exists?(destination)
+if ::File.exists?(clone_file) and not ::File.exists?(destination)
 
   # Make a fresh clone
   git destination do
@@ -59,15 +59,15 @@ if ::File.exists?(clonefile) and not ::File.exists?(destination)
     cwd node['typo3']['base_directory']
     umask 0022
     command <<-EOH
-      touch #{markerfile}
-      rm #{clonefile}
+      touch #{marker_file}
+      rm #{clone_file}
     EOH
   end
 
 elsif ::File.exists?(destination)
 
   # Only reset if managed by Chef
-  if ::File.exists?(markerfile)
+  if ::File.exists?(marker_file)
 
     # Update existing TYPO3 core (the above sync does not work if the revision does not change)
     # Additionally, update the remote repository URL in case it was changed
@@ -108,11 +108,11 @@ node['typo3']['install_branches'].each do |v|
 
   source             = shared_git_directory + ".git"
   destination        = base_directory + "/" + branch + ".git"
-  clonefile          = base_directory + "/" + branch + ".clone"
-  markerfile         = base_directory + "/" + branch + ".cloned-by-chef"
+  clone_file         = base_directory + "/" + branch + ".clone"
+  marker_file        = base_directory + "/" + branch + ".cloned-by-chef"
 
   # Only clone the repository if explicitely requested
-  if ::File.exists?(clonefile)
+  if ::File.exists?(clone_file)
 
     if ::File.exists?(destination)
       # If the destination already exists, operate on a temporary folder and let the admin review the change
@@ -127,7 +127,7 @@ node['typo3']['install_branches'].each do |v|
       FileUtils.remove_entry_secure path
 
       destination    = base_directory + "/" + tempname + ".git"
-      markerfile     = base_directory + "/" + tempname + ".cloned-by-chef"
+      marker_file    = base_directory + "/" + tempname + ".cloned-by-chef"
     end
 
     # Create initial clone of TYPO3core
@@ -137,8 +137,8 @@ node['typo3']['install_branches'].each do |v|
       umask 0022
       command <<-EOH
         sh #{git_new_workdir} #{source} #{destination}
-        touch #{markerfile}
-        rm #{clonefile}
+        touch #{marker_file}
+        rm #{clone_file}
       EOH
     end
 
@@ -151,7 +151,7 @@ node['typo3']['install_branches'].each do |v|
   elsif ::File.exists?(destination)
 
     # Only reset if managed by Chef
-    if ::File.exists?(markerfile)
+    if ::File.exists?(marker_file)
 
       # Update existing clone of TYPO3core (using git reset)
       execute "Update TYPO3core for version #{branch}" do

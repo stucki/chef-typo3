@@ -2,6 +2,10 @@
 
 This file is used to list changes made in each version of typo3.
 
+## 0.5.0:
+
+* [CLEANUP] Rename internal variables
+
 ## 0.4.3:
 
 * [BUGFIX] Set the "fetch" refspec when updating the remote
