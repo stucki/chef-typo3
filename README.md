@@ -14,11 +14,16 @@ This cookbook installs a shared TYPO3core.git folder in the base
 directory. The folder contains nothing except a .git folder.
 Define any number of branches that need to be installed & updated.
 
-To install a new repository, create an empty file <branchname>.clone
-inside the base directory. This is neccessary to avoid conflicts with
-existing folders within the same base directory.
-Once cloned, the cookbook will delete the *.clone file and keep the
-project up to date.
+New branches will be cloned as they are defined in
+`node['typo3']['install_branches']`.
+Alternatively, you can also set `node['typo3']['check_clone_file']` which
+means that branches are only cloned if an empty file `<branchname>.clone`
+exists within the base directory. This can be useful in mass-hosting
+environments, where all branches are defined globally, but not all of
+them are needed on every host.
+
+Once cloned, the cookbook will delete the *.clone file (if any) and keep
+the project up to date.
 
 Contributing
 ------------
