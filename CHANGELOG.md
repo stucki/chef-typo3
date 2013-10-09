@@ -6,6 +6,7 @@ This file is used to list changes made in each version of typo3.
 
 #### Breaking changes
 
+* [FEATURE] Change "install_branches" into a normal key/value array
 * [FEATURE] Add new option "check_clone_file" to skip the check for *.clone files.
   The setting is turned off by default, which is a different behaviour than before.
   This means that any repository set in "install_branches" is now created by default.

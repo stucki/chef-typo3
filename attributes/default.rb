@@ -11,10 +11,17 @@ default['typo3']['install_branches'] = %w{
 }
 
 # Alternatively, install_branches can also hold pairs of <branch name> / <reference>
-#default['typo3']['install_branches'] = [
-#  {:name => 'TYPO3_4-7', :reference => 'TYPO3_4-7-20'},
-#  {:name => 'TYPO3_6-1', :reference => 'origin/TYPO3_6-1'}
-#]
+# FIXME: Support simple arrays of strings again. For now, overwrite the values from above and use a hash by default.
+default['typo3']['install_branches'] = {
+  'TYPO3_4-7' => 'origin/TYPO3_4-7',
+  'TYPO3_6-1' => 'origin/TYPO3_6-1',
+}
+
+# Unset or override these values
+#override['typo3']['install_branches'] = {
+#  'TYPO3_4-7' => false,
+#  'TYPO3_6-1' => 'TYPO3_6-1-0',
+#}
 
 # Location of the "git-new-workdir" helper script
 if node['platform'] == 'debian' && node['platform_version'].to_f < 6 then

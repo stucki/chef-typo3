@@ -33,19 +33,15 @@ check_clone_file     = node['typo3']['check_clone_file']
 # Maintain clones of TYPO3 versions
 #####################################
 
-node['typo3']['install_branches'].each do |v|
-
-  # Read branch name and reference from attributes
-  if v.kind_of?(Mash) and v.has_key?(:name)
-    branch      = v[:name]
-    reference   = v[:reference]
-  elsif v.kind_of?(String)
-    branch      = v
-    reference   = v
-  else
-    Chef::Log.error("Error: Syntax error in node['typo3']['install_branches']:\n" +  node['typo3']['install_branches'].to_s + "\n")
-    Chef::Application.fatal!("Cannot continue.")
+node['typo3']['install_branches'].each do |branch, reference|
+  if reference == false
+    Chef::Log.debug("Skipping update of " + branch + " because it is disabled.")
+    next
+  elsif reference.nil?
+    reference = branch
   end
+
+  Chef::Log.debug("Update TYPO3 branch \"" + branch + "\" from reference \"" + reference + "\"")
 
   source             = shared_git_directory + ".git"
   destination        = base_directory + "/" + branch + ".git"
