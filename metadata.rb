@@ -4,7 +4,7 @@ maintainer_email 'michael.stucki@typo3.org'
 license          'MIT'
 description      'Clone TYPO3 CMS to a server, and keep it updated'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version          '0.4.3'
+version          '0.5.0'
 
 depends "git"
 
